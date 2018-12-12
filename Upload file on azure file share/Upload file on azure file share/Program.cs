@@ -3,6 +3,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.File;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +14,9 @@ namespace Upload_file_on_azure_file_share
     {
         static void Main(string[] args)
         {
+
+            UploadFileToFileShare();
             DownloadFileFromFileShare();
-            //UploadFileToFileShare();
 
         }
         private static void DownloadFileFromFileShare()
@@ -55,29 +57,45 @@ namespace Upload_file_on_azure_file_share
             }
         }
 
-        //private static void UploadFileToFileShare()
-        //{
-        //    var filename = @"";
-        //    // Parse the connection string and return a reference to the storage account.
-        //    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-        //        CloudConfigurationManager.GetSetting("StorageConnectionString"));
+        private static void UploadFileToFileShare()
+        {
+            var filename = @"C:\Users\vikhatal\Downloads\taeget Report.txt";
+            // Parse the connection string and return a reference to the storage account.
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+                CloudConfigurationManager.GetSetting("StorageConnectionString"));
 
-        //    // Create a reference to the file client.
-        //    CloudFileClient = storageAccount.CreateCloudFileClient();
+            // Create a CloudFileClient object for credentialed access to Azure Files.
+            CloudFileClient fileClient = storageAccount.CreateCloudFileClient();
 
-        //    // Create a reference to the Azure path
-        //    CloudFileDirectory cloudFileDirectory = GetCloudFileShare().GetRootDirectoryReference().GetDirectoryReference(path);
 
-        //    //Create a reference to the filename that you will be uploading
-        //    CloudFile cloudFile = cloudSubDirectory.GetFileReference(fileName);
 
-        //    //Open a stream from a local file.
-        //    Stream fileStream = File.OpenRead(localfile);
+            // Get a reference to the file share we created previously.
+            CloudFileShare share = fileClient.GetShareReference("logger");
 
-        //    //Upload the file to Azure.
-        //    await cloudFile.UploadFromStreamAsync(fileStream);
-        //    fileStream.Dispose();
+            // Ensure that the share exists.
+            if (share.Exists())
+            {
+                // Get a reference to the root directory for the share.
+                CloudFileDirectory rootDir = share.GetRootDirectoryReference();
 
-        //}
+                // Get a reference to the directory we created previously.
+                CloudFileDirectory sampleDir = rootDir.GetDirectoryReference("CustomLogs");
+
+                // Ensure that the directory exists.
+                if (sampleDir.Exists())
+                {
+                    // Get a reference to the file we created previously.
+                    CloudFile file = sampleDir.GetFileReference("IMG_8769 (1).JPG");
+                    //Open a stream from a local file.
+                    Stream fileStream = File.OpenRead(filename);
+
+                    //Upload the file to Azure.
+                    file.UploadFromStreamAsync(fileStream);
+                    fileStream.Dispose();
+                }
+            }
+                  
+
+        }
     }
 }
