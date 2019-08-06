@@ -25,12 +25,21 @@ namespace UploadImageOnBlob
             // Get the reference to the block blob from the container
             CloudBlockBlob blockBlob = container.GetBlockBlobReference("profilePic.jpg");
             // Upload the file
-            using (Stream file = System.IO.File.OpenRead(@"D:\profilePic.jpg"))
+            using (Stream file = System.IO.File.OpenRead(@"C:\Users\vikhatal\Pictures\profilePic.jpg"))
             {
 
                 blockBlob.UploadFromStream(file);
 
             }
+
+            // Download the file
+            using (var fileStream = System.IO.File.OpenWrite(@"C:\Users\vikhatal\Pictures\profilePic1.jpg"))
+            {
+                blockBlob.DownloadToStream(fileStream);
+            }
+
+            // Delete the blob.
+            blockBlob.Delete();
         }
       
     }
